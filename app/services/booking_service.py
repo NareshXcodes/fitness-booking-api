@@ -5,7 +5,7 @@ from app.database import get_db
 from app.models.booking import Booking
 from app.models.fitness_class import FitnessClass
 from zoneinfo import ZoneInfo
-
+from app.logger import logger
 
 IST = ZoneInfo("Asia/Kolkata")
 
@@ -19,6 +19,7 @@ def book_class(class_id : int, user_id : int, client_name : str, client_email : 
         )
 
     if fitness_class.available_slots <= 0:
+        logger.warning(f"Booking rejected. No slots available for class {class_id}.")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No slots available."
@@ -38,6 +39,7 @@ def book_class(class_id : int, user_id : int, client_name : str, client_email : 
     booking = db.query(Booking).filter(Booking.class_id == class_id,Booking.user_id == user_id).first()
 
     if booking:
+        logger.warning(f"{booking.user.email} attempted duplicate booking for class {class_id}.")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="You have already booked this class."

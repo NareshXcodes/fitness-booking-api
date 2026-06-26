@@ -1,17 +1,17 @@
 from datetime import datetime
 from app.config import IST
-from pydantic import BaseModel, ConfigDict, EmailStr,field_serializer
+from pydantic import BaseModel, ConfigDict, EmailStr,field_serializer , Field
 
 
 class BookingCreate(BaseModel):
     class_id : int
-    client_name : str
+    client_name : str = Field(min_length=2)
     client_email : EmailStr
 
 class BookingRead(BaseModel):
     id : int
     class_id : int
-    client_name : str
+    client_name : str = Field(min_length=2)
     client_email : EmailStr
     booked_at : datetime
     class_name : str

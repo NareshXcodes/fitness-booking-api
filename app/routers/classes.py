@@ -9,7 +9,7 @@ from app.models.user import User
 from app.schemas.class_ import ClassCreate, ClassRead
 from zoneinfo import ZoneInfo
 from datetime import datetime
-
+from app.logger import logger
 
 router = APIRouter(prefix="/classes",tags=['Fitness Classes'])
 
@@ -21,6 +21,9 @@ IST = ZoneInfo("Asia/Kolkata")
 def create_classes(class_data: ClassCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
 
     if class_data.availableSlots <= 0:
+        logger.warning(
+            f"{current_user.email} attempted to create a class with invalid slots."
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Available slots must be greater than 0."
@@ -33,15 +36,17 @@ def create_classes(class_data: ClassCreate, current_user: User = Depends(get_cur
     else:
         dt = dt.astimezone(IST)
 
-    dt = dt.replace(tzinfo=None)
 
-    
-    ist_time = class_data.dateTime.astimezone(IST)
-    if class_data.dateTime <= datetime.now(class_data.dateTime.tzinfo):
+    if dt <= datetime.now(IST):
+        logger.warning(
+            f"{current_user.email} attempted to create a class with a past datetime."
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Class date must be in the future."
         )
+
+    dt = dt.replace(tzinfo=None)
 
     fc = FitnessClass(
         name=class_data.name,
@@ -51,9 +56,21 @@ def create_classes(class_data: ClassCreate, current_user: User = Depends(get_cur
         created_by=current_user.id,
     )
 
-    db.add(fc)
-    db.commit()
-    db.refresh(fc)
+    try:
+        db.add(fc)
+        db.commit()
+        db.refresh(fc)
+        logger.info(f"{current_user.email} created class '{fc.name}' scheduled at {fc.date_time}")
+    except Exception:
+        db.rollback()
+
+        logger.exception(f"Failed to create class for user {current_user.email}")
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create class."
+        )
+    
     return ClassRead(
         id = fc.id,
         name = fc.name,
@@ -69,6 +86,8 @@ def get_classes(db: Session = Depends(get_db),current_user: User = Depends(get_c
 
     classes = db.query(FitnessClass).filter(FitnessClass.created_by == current_user.id,FitnessClass.date_time >= now_ist).order_by(FitnessClass.date_time).all()
 
+    logger.info(f"{current_user.email} fetched available classes.")
+    
     return [
         ClassRead(
             id=c.id,

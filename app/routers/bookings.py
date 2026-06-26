@@ -1,4 +1,4 @@
-
+from app.logger import logger
 from typing import List
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, status, HTTPException
@@ -23,6 +23,7 @@ def create_booking(new_booking : BookingCreate, db: Session = Depends(get_db), c
             client_email = new_booking.client_email,
             db = db 
         )
+    logger.info(f"{current_user.email} booked class '{booking.fitness_class.name}'.")
 
     return BookingRead(
         id = booking.id,
@@ -39,6 +40,7 @@ def create_booking(new_booking : BookingCreate, db: Session = Depends(get_db), c
 def get_bookings(db: Session = Depends(get_db),current_user: User = Depends(get_current_user)):
     bookings = db.query(Booking).filter(Booking.user_id == current_user.id).all()
 
+    logger.info(f"{current_user.email} viewed their bookings.")
     return [
         BookingRead(
             id=booking.id,
