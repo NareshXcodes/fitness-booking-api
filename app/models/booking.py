@@ -2,6 +2,13 @@ from datetime import datetime
 from sqlalchemy import DateTime, Integer, String, ForeignKey, func
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.database import Base
+from zoneinfo import ZoneInfo
+
+
+
+IST = ZoneInfo("Asia/Kolkata")
+
+
 
 class Booking(Base):
     __tablename__ ="bookings"
@@ -11,7 +18,7 @@ class Booking(Base):
     user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id",ondelete="SET NULL"),nullable=False)
     client_name : Mapped[str] = mapped_column(String, nullable=False)
     client_email : Mapped[str] = mapped_column(String, nullable=False)
-    booked_at : Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    booked_at : Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(IST).replace(tzinfo=None),nullable=False)
 
     # Relationships
     user: Mapped["User"] = relationship(

@@ -1,6 +1,6 @@
 from datetime import datetime
-
-from pydantic import BaseModel, ConfigDict, EmailStr
+from app.config import IST
+from pydantic import BaseModel, ConfigDict, EmailStr,field_serializer
 
 
 class BookingCreate(BaseModel):
@@ -18,3 +18,14 @@ class BookingRead(BaseModel):
     dateTime : datetime
     instructor : str
     model_config = ConfigDict(from_attributes=True)
+    @field_serializer("booked_at")
+    def serialize_booked_at(self, value: datetime):
+        if value.tzinfo is None:
+            value = IST.localize(value)
+        return value.isoformat()
+
+    @field_serializer("dateTime")
+    def serialize_class_time(self, value: datetime):
+        if value.tzinfo is None:
+            value = IST.localize(value)
+        return value.isoformat()

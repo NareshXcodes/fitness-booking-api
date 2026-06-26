@@ -1,6 +1,8 @@
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from zoneinfo import ZoneInfo
 
+IST = ZoneInfo("Asia/Kolkata")
 
 class Settings(BaseSettings):
     DATABASE_URL: PostgresDsn

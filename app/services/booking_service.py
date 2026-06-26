@@ -24,7 +24,9 @@ def book_class(class_id : int, user_id : int, client_name : str, client_email : 
             detail="No slots available."
         )
 
-    if fitness_class.date_time <= datetime.now(IST):
+    now_ist = datetime.now(IST).replace(tzinfo=None)
+
+    if fitness_class.date_time <= now_ist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot book an expired class."

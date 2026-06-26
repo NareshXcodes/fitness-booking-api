@@ -11,7 +11,7 @@ class FitnessClass(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     instructor: Mapped[str] = mapped_column(String(100), nullable=False)
-    date_time: Mapped[datetime] = mapped_column(DateTime(timezone.utc), nullable=False)
+    date_time: Mapped[datetime] = mapped_column(DateTime(timezone=False), nullable=False)
     available_slots : Mapped[int] = mapped_column(Integer, nullable=False)
     created_by : Mapped[int] = mapped_column(Integer, ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
 

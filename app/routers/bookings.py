@@ -14,14 +14,14 @@ from app.services.booking_service import book_class
 router = APIRouter(tags=['Bookings'])
 
 
-@router.post('/',response_model= BookingRead,status_code=status.HTTP_201_CREATED)
+@router.post('/book',response_model= BookingRead,status_code=status.HTTP_201_CREATED)
 def create_booking(new_booking : BookingCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     booking = book_class(
-        class_id = new_booking.class_id,
-        user_id = current_user.id,
-        client_name = new_booking.client_name,
-        client_email = new_booking.client_email,
-        db = db 
+            class_id = new_booking.class_id,
+            user_id = current_user.id,
+            client_name = new_booking.client_name,
+            client_email = new_booking.client_email,
+            db = db 
         )
 
     return BookingRead(

@@ -25,6 +25,16 @@ def create_classes(class_data: ClassCreate, current_user: User = Depends(get_cur
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Available slots must be greater than 0."
         )
+
+    dt = class_data.dateTime
+
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=IST)
+    else:
+        dt = dt.astimezone(IST)
+
+    dt = dt.replace(tzinfo=None)
+
     
     ist_time = class_data.dateTime.astimezone(IST)
     if class_data.dateTime <= datetime.now(class_data.dateTime.tzinfo):
@@ -36,7 +46,7 @@ def create_classes(class_data: ClassCreate, current_user: User = Depends(get_cur
     fc = FitnessClass(
         name=class_data.name,
         instructor=class_data.instructor,
-        date_time=ist_time,
+        date_time=dt,
         available_slots=class_data.availableSlots,
         created_by=current_user.id,
     )

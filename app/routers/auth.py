@@ -9,7 +9,7 @@ from app.schemas.auth import SignupRequest, SignupResponse, TokenResponse
 from app.services.auth_service import create_access_token, hash_password, verify_password
 
 
-router = APIRouter(prefix="/auth" ,tags=["Auth"])
+router = APIRouter(prefix="/auth" ,tags=["Authentication"])
 
 @router.post("/login", response_model=TokenResponse)
 def login(user_credential : OAuth2PasswordRequestForm = Depends(),db:Session = Depends(get_db)):
