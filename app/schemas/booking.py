@@ -18,14 +18,19 @@ class BookingRead(BaseModel):
     dateTime : datetime
     instructor : str
     model_config = ConfigDict(from_attributes=True)
+
     @field_serializer("booked_at")
     def serialize_booked_at(self, value: datetime):
         if value.tzinfo is None:
-            value = IST.localize(value)
+            value = value.replace(tzinfo=IST)
+        else:
+            value = value.astimezone(IST)
         return value.isoformat()
 
     @field_serializer("dateTime")
     def serialize_class_time(self, value: datetime):
         if value.tzinfo is None:
-            value = IST.localize(value)
+            value = value.replace(tzinfo=IST)
+        else:
+            value = value.astimezone(IST)
         return value.isoformat()

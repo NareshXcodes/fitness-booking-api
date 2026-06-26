@@ -24,7 +24,10 @@ def book_class(class_id : int, user_id : int, client_name : str, client_email : 
             detail="No slots available."
         )
 
+
     now_ist = datetime.now(IST).replace(tzinfo=None)
+    print(fitness_class.date_time, fitness_class.date_time.tzinfo)
+    print(now_ist, now_ist.tzinfo)
 
     if fitness_class.date_time <= now_ist:
         raise HTTPException(

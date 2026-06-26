@@ -19,5 +19,7 @@ class ClassRead(BaseModel):
     @field_serializer("dateTime")
     def serialize_datetime(self, value: datetime):
         if value.tzinfo is None:
-            value = IST.localize(value)
+            value = value.replace(tzinfo=IST)
+        else:
+            value = value.astimezone(IST)
         return value.isoformat()
