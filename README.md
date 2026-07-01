@@ -190,6 +190,44 @@ Seed inserts
 
 ---
 
+### Database Schema :
+
+
+```mermaid
+erDiagram
+    USER {
+        int id PK
+        string name
+        string email
+        string password
+        timestamp created_at
+    }
+
+    FITNESS_CLASS {
+        int id PK
+        string name
+        string instructor
+        timestamp date_time
+        int available_slots
+        int created_by FK
+    }
+
+    BOOKING {
+        int id PK
+        int class_id FK
+        int user_id FK
+        string client_name
+        string client_email
+        timestamp booked_at
+    }
+
+    USER ||--o{ FITNESS_CLASS : creates
+    USER ||--o{ BOOKING : books
+    FITNESS_CLASS ||--o{ BOOKING : has
+```
+
+---
+
 # 📌 API Usage
 
 ---
